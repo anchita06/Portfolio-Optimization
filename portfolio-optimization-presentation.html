@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Optimization - Indian Stocks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00D4AA;
+            --secondary: #0066FF;
+            --accent: #7C3AED;
+            --bg-primary: #0A0F1C;
+            --bg-secondary: #111827;
+            --bg-card: #1F2937;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --gradient-primary: linear-gradient(135deg, #00D4AA 0%, #0066FF 100%);
+            --gradient-accent: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+            --gradient-success: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Ambient Background */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 0% 0%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 100% 100%, rgba(0, 102, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(124, 58, 237, 0.05) 0%, transparent 50%);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(10, 15, 28, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Sections */
+        section {
+            min-height: 100vh;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 100px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .hero h1 .highlight {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Section Styling */
+        .section-header {
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .section-desc {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-top: 1rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 212, 170, 0.3);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1.25rem;
+            background: var(--gradient-primary);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Introduction Section */
+        .intro-section {
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pillar-card {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        .pillar-card:hover {
+            transform: scale(1.02);
+            border-color: rgba(0, 212, 170, 0.4);
+        }
+
+        .pillar-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .pillar-card:nth-child(1) .pillar-icon {
+            background: linear-gradient(135deg, #00D4AA 0%, #00A88A 100%);
+        }
+
+        .pillar-card:nth-child(2) .pillar-icon {
+            background: linear-gradient(135deg, #0066FF 0%, #0044CC 100%);
+        }
+
+        .pillar-card:nth-child(3) .pillar-icon {
+            background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+        }
+
+        .pillar-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pillar-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Sectors Section */
+        .sectors-section {
+            background: var(--bg-primary);
+        }
+
+        .sector-card {
+            position: relative;
+            padding: 2rem;
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 220px;
+        }
+
+        .sector-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.9;
+            z-index: 1;
+        }
+
+        .sector-card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .sector-card.healthcare {
+            background: linear-gradient(135deg, #00D4AA 0%, #00A88A 100%);
+        }
+
+        .sector-card.energy {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+
+        .sector-card.it {
+            background: linear-gradient(135deg, #0066FF 0%, #0044CC 100%);
+        }
+
+        .sector-card.fmcg {
+            background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+        }
+
+        .sector-card.auto {
+            background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+        }
+
+        .sector-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .sector-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .sector-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Sector Deep Dive */
+        .sector-detail {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .sector-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .sector-icon-lg {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+
+        .drivers-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .driver-item {
+            background: rgba(0, 212, 170, 0.05);
+            border: 1px solid rgba(0, 212, 170, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .driver-item h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .driver-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Stocks Selection */
+        .stocks-section {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+
+        .stocks-table {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 1.25rem 2rem;
+            background: rgba(0, 212, 170, 0.1);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s ease;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .table-row:hover {
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .sector-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+        }
+
+        .sector-dot.healthcare { background: #00D4AA; }
+        .sector-dot.energy { background: #10B981; }
+        .sector-dot.it { background: #0066FF; }
+        .sector-dot.fmcg { background: #7C3AED; }
+        .sector-dot.auto { background: #EC4899; }
+
+        /* Methodology Section */
+        .methodology-section {
+            background: var(--bg-primary);
+        }
+
+        .process-timeline {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            position: relative;
+            margin-top: 3rem;
+        }
+
+        .process-timeline::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            height: 2px;
+            background: var(--gradient-primary);
+            z-index: 0;
+        }
+
+        .process-step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--bg-card);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .process-step h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .process-step p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .process-step .tools {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tool-tag {
+            padding: 0.25rem 0.75rem;
+            background: rgba(0, 212, 170, 0.1);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        /* Results Section */
+        .results-section {
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .results-hero {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .result-metric {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-metric::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .result-metric:nth-child(1)::before { background: var(--gradient-primary); }
+        .result-metric:nth-child(2)::before { background: var(--gradient-success); }
+        .result-metric:nth-child(3)::before { background: var(--gradient-accent); }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-metric:nth-child(1) .metric-value { color: var(--primary); }
+        .result-metric:nth-child(2) .metric-value { color: #10B981; }
+        .result-metric:nth-child(3) .metric-value { color: #7C3AED; }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Timeline */
+        .deployment-timeline {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+        }
+
+        .timeline-title {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .timeline-events {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline-events::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .timeline-event {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-event:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.5rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid var(--bg-card);
+        }
+
+        .event-date {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .event-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-detail {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Observations */
+        .observations-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .observation-card {
+            background: rgba(0, 212, 170, 0.05);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .observation-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+
+        .observation-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Conclusion */
+        .conclusion-section {
+            background: var(--bg-primary);
+        }
+
+        .conclusion-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .conclusion-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .conclusion-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .conclusion-list {
+            list-style: none;
+        }
+
+        .conclusion-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .conclusion-list li:last-child {
+            border-bottom: none;
+        }
+
+        .conclusion-list li::before {
+            content: '→';
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-quote {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .footer-quote cite {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-style: normal;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .pillars-grid,
+            .process-timeline,
+            .results-hero,
+            .observations-grid,
+            .conclusion-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .process-timeline::before {
+                display: none;
+            }
+
+            nav ul {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            section {
+                padding: 6rem 1.5rem 3rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-bg"></div>
+
+    <nav>
+        <div class="nav-content">
+            <div class="logo">📈 Portfolio Optimization</div>
+            <ul>
+                <li><a href="#hero">Overview</a></li>
+                <li><a href="#intro">Introduction</a></li>
+                <li><a href="#sectors">Sectors</a></li>
+                <li><a href="#stocks">Stocks</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#results">Results</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section id="hero" class="hero">
+        <div class="hero-content">
+            <div class="hero-tag">
+                <span>📊</span>
+                <span>Investment Strategy Report</span>
+            </div>
+            <h1>Portfolio Optimization:<br><span class="highlight">Indian Stocks</span></h1>
+            <p class="hero-subtitle">A comprehensive analysis of sector-diversified equity portfolios utilizing Modern Portfolio Theory to maximize risk-adjusted returns.</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-value">₹10L</div>
+                    <div class="stat-label">Total Capital</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">₹62,525</div>
+                    <div class="stat-label">Annual Return</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Strategic Sectors</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Selected Stocks</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="intro" class="intro-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Introduction</div>
+                <h2 class="section-title">Portfolio Optimization Strategy</h2>
+                <p class="section-desc">Building resilient, diversified portfolios that provide the best possible return for a given level of risk.</p>
+            </div>
+
+            <div class="pillars-grid">
+                <div class="pillar-card animate-on-scroll">
+                    <div class="pillar-icon">📐</div>
+                    <h3>Modern Portfolio Theory</h3>
+                    <p>Risk is inherent to higher rewards. MPT enables investors to maximize expected returns by quantifying and managing market risk through optimal asset allocation.</p>
+                </div>
+                <div class="pillar-card animate-on-scroll">
+                    <div class="pillar-icon">🎯</div>
+                    <h3>Strategic Diversification</h3>
+                    <p>Selecting a mix of assets with low or negative correlation. When one asset declines, others may rise or remain stable, minimizing overall portfolio volatility.</p>
+                </div>
+                <div class="pillar-card animate-on-scroll">
+                    <div class="pillar-icon">📊</div>
+                    <h3>Sharpe Ratio Optimization</h3>
+                    <p>The key metric for evaluation. It measures excess return per unit of risk. Our methodology maximizes this ratio to ensure every unit of risk is justified.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sectors" class="sectors-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Sector Coverage</div>
+                <h2 class="section-title">Five High-Growth Pillars</h2>
+                <p class="section-desc">Strategic diversification across key sectors of the Indian economy, selected to balance volatility and maximize long-term returns.</p>
+            </div>
+
+            <div class="grid-5">
+                <div class="sector-card healthcare animate-on-scroll">
+                    <div class="sector-badge">Defensive & Growth</div>
+                    <h3>🏥 Healthcare & Insurance</h3>
+                    <p>Favorable demographics, rising chronic disease burden, and government schemes like Ayushman Bharat.</p>
+                </div>
+                <div class="sector-card energy animate-on-scroll">
+                    <div class="sector-badge">Sustainability</div>
+                    <h3>⚡ Renewable Energy</h3>
+                    <p>Targeting 450 GW capacity by 2030 with heavy investment in solar, wind, and grid modernization.</p>
+                </div>
+                <div class="sector-card it animate-on-scroll">
+                    <div class="sector-badge">Global Resilience</div>
+                    <h3>💻 Information Technology</h3>
+                    <p>Global digital transformation leader focusing on AI adoption, cloud computing, and data analytics.</p>
+                </div>
+                <div class="sector-card fmcg animate-on-scroll">
+                    <div class="sector-badge">Stable Cash Flow</div>
+                    <h3>🛒 FMCG</h3>
+                    <p>Essential consumption supported by premiumization trends, e-commerce, and rural market expansion.</p>
+                </div>
+                <div class="sector-card auto animate-on-scroll">
+                    <div class="sector-badge">Cyclical Recovery</div>
+                    <h3>🚗 Automobiles</h3>
+                    <p>Cyclical recovery aided by PLI schemes and structural shift toward Electric Vehicles (EVs).</p>
+                </div>
+            </div>
+
+            <div class="sector-detail animate-on-scroll" style="margin-top: 4rem;">
+                <div class="sector-header">
+                    <div class="sector-icon-lg" style="background: var(--gradient-primary);">🏥</div>
+                    <div>
+                        <h3>Healthcare & Insurance</h3>
+                        <p style="color: var(--text-secondary);">Defensive Growth Sector • 15-17% Avg. CAGR</p>
+                    </div>
+                </div>
+                <div class="drivers-list">
+                    <div class="driver-item">
+                        <h4>👥 Demographic Tailwinds</h4>
+                        <p>Rapidly aging population and rising incidence of chronic lifestyle diseases creating sustained demand.</p>
+                    </div>
+                    <div class="driver-item">
+                        <h4>📋 Policy Support</h4>
+                        <p>Government schemes like Ayushman Bharat aiming to provide coverage to over 100 million families.</p>
+                    </div>
+                    <div class="driver-item">
+                        <h4>💡 Innovation & Digital</h4>
+                        <p>Surge in telemedicine adoption and digital health platforms. Leading pharma increasing R&D spend.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stocks" class="stocks-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Portfolio Selection</div>
+                <h2 class="section-title">Selected Stocks</h2>
+                <p class="section-desc">Strategic selection of 10 market leaders across 5 high-growth sectors for optimal diversification.</p>
+            </div>
+
+            <div class="stocks-table animate-on-scroll">
+                <div class="table-header">
+                    <span>Sector</span>
+                    <span>Company 1</span>
+                    <span>Company 2</span>
+                </div>
+                <div class="table-row">
+                    <span><span class="sector-dot healthcare"></span>Healthcare</span>
+                    <span>Sun Pharma</span>
+                    <span>Dr. Reddy's</span>
+                </div>
+                <div class="table-row">
+                    <span><span class="sector-dot energy"></span>Renewable Energy</span>
+                    <span>ONGC</span>
+                    <span>NTPC</span>
+                </div>
+                <div class="table-row">
+                    <span><span class="sector-dot it"></span>IT Services</span>
+                    <span>TCS</span>
+                    <span>HCL Tech</span>
+                </div>
+                <div class="table-row">
+                    <span><span class="sector-dot fmcg"></span>FMCG</span>
+                    <span>ITC</span>
+                    <span>HUL</span>
+                </div>
+                <div class="table-row">
+                    <span><span class="sector-dot auto"></span>Automobile</span>
+                    <span>Eicher Motors</span>
+                    <span>Maruti Suzuki</span>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 3rem;">
+                <div class="card animate-on-scroll">
+                    <div class="card-icon">🏆</div>
+                    <h3>Market Leadership</h3>
+                    <p>Selected companies are dominant players with strong balance sheets, proven track records, and significant market share in their respective domains.</p>
+                </div>
+                <div class="card animate-on-scroll">
+                    <div class="card-icon">🎯</div>
+                    <h3>Diversification Benefit</h3>
+                    <p>Low inter-sector correlation reduces overall portfolio volatility. Defensive sectors provide cushion while cyclical sectors drive growth.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="methodology" class="methodology-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Process</div>
+                <h2 class="section-title">Methodology & Optimization</h2>
+                <p class="section-desc">A systematic four-stage approach leveraging modern computing tools and statistical theories.</p>
+            </div>
+
+            <div class="process-timeline">
+                <div class="process-step animate-on-scroll">
+                    <div class="step-number">01</div>
+                    <h4>Data Acquisition</h4>
+                    <p>Sourcing historical stock price data and preprocessing</p>
+                    <div class="tools">
+                        <span class="tool-tag">Pandas</span>
+                        <span class="tool-tag">NumPy</span>
+                    </div>
+                </div>
+                <div class="process-step animate-on-scroll">
+                    <div class="step-number">02</div>
+                    <h4>Statistical Analysis</h4>
+                    <p>Calculating returns and constructing matrices</p>
+                    <div class="tools">
+                        <span class="tool-tag">Log Returns</span>
+                        <span class="tool-tag">Covariance</span>
+                    </div>
+                </div>
+                <div class="process-step animate-on-scroll">
+                    <div class="step-number">03</div>
+                    <h4>Optimization Engine</h4>
+                    <p>Maximize Sharpe Ratio with constraints</p>
+                    <div class="tools">
+                        <span class="tool-tag">Solver</span>
+                        <span class="tool-tag">Scipy</span>
+                    </div>
+                </div>
+                <div class="process-step animate-on-scroll">
+                    <div class="step-number">04</div>
+                    <h4>Execution Strategy</h4>
+                    <p>Staggered deployment over 10 days</p>
+                    <div class="tools">
+                        <span class="tool-tag">₹1L/Day</span>
+                        <span class="tool-tag">DCA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="results" class="results-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Performance</div>
+                <h2 class="section-title">Results & Performance</h2>
+                <p class="section-desc">Execution of the 10-day incremental investment strategy and final portfolio outcomes.</p>
+            </div>
+
+            <div class="results-hero">
+                <div class="result-metric animate-on-scroll">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-value">₹10.00L</div>
+                    <div class="metric-label">Total Capital Deployed</div>
+                </div>
+                <div class="result-metric animate-on-scroll">
+                    <div class="metric-icon">📈</div>
+                    <div class="metric-value">₹62,525</div>
+                    <div class="metric-label">Annual Return</div>
+                </div>
+                <div class="result-metric animate-on-scroll">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-value">Staggered</div>
+                    <div class="metric-label">Investment Strategy</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="deployment-timeline animate-on-scroll">
+                    <h3 class="timeline-title">⏱️ Deployment Timeline</h3>
+                    <div class="timeline-events">
+                        <div class="timeline-event">
+                            <div class="event-date">June 06, 2024</div>
+                            <div class="event-title">Initiation</div>
+                            <div class="event-detail">₹1,00,000 Invested</div>
+                        </div>
+                        <div class="timeline-event">
+                            <div class="event-date">June 10-12, 2024</div>
+                            <div class="event-title">Ramp Up</div>
+                            <div class="event-detail">Accumulated: ₹6,00,000</div>
+                        </div>
+                        <div class="timeline-event">
+                            <div class="event-date">June 16, 2024</div>
+                            <div class="event-title">Full Deployment</div>
+                            <div class="event-detail">Total: ₹10,00,000</div>
+                        </div>
+                        <div class="timeline-event">
+                            <div class="event-date">Assessment</div>
+                            <div class="event-title">Final Review</div>
+                            <div class="event-detail">Portfolio Optimization Complete</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--primary);">💡 Key Observations</h3>
+                    <div class="grid-3" style="grid-template-columns: 1fr;">
+                        <div class="observation-card animate-on-scroll">
+                            <h4>✅ Volatility Mitigation</h4>
+                            <p>Staggered entry over 10 days smoothed out short-term market fluctuations, lowering average entry cost.</p>
+                        </div>
+                        <div class="observation-card animate-on-scroll">
+                            <h4>✅ Sector Balance</h4>
+                            <p>Diversification across defensive (FMCG/Pharma) and cyclical (Auto/IT) sectors stabilized returns.</p>
+                        </div>
+                        <div class="observation-card animate-on-scroll">
+                            <h4>✅ Optimization Success</h4>
+                            <p>Daily re-weighting via Solver improved the Sharpe Ratio, enhancing risk-adjusted performance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="conclusion-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Summary</div>
+                <h2 class="section-title">Conclusion & Next Steps</h2>
+                <p class="section-desc">Strategic advantages, performance drivers, and future roadmap for the optimized portfolio.</p>
+            </div>
+
+            <div class="conclusion-grid">
+                <div class="conclusion-card animate-on-scroll">
+                    <h3>🛡️ Key Takeaways</h3>
+                    <ul class="conclusion-list">
+                        <li>Strategic diversification across 5 high-growth sectors</li>
+                        <li>Sharpe-driven optimization for efficient weight allocation</li>
+                        <li>Staged deployment successfully mitigated timing risk</li>
+                    </ul>
+                </div>
+                <div class="conclusion-card animate-on-scroll">
+                    <h3>⚡ What Worked</h3>
+                    <ul class="conclusion-list">
+                        <li>Selection of dominant sector leaders ensured stability</li>
+                        <li>Low to moderate cross-sector correlations reduced volatility</li>
+                        <li>Dynamic rebalancing captured short-term efficiencies</li>
+                    </ul>
+                </div>
+                <div class="conclusion-card animate-on-scroll">
+                    <h3>🚀 Strategic Roadmap</h3>
+                    <ul class="conclusion-list">
+                        <li>Extend investment horizon and refine rebalancing cadence</li>
+                        <li>Incorporate transaction costs and stress testing</li>
+                        <li>Evaluate renewable & EV supply chain additions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-quote">
+            "A systematic approach leveraging advanced optimization techniques and continuous monitoring provides a solid foundation for achieving consistent, sustainable returns in the Indian market."
+            <cite>— Investment and Banking Analytics Report</cite>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll animation observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 100);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
